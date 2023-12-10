@@ -33,6 +33,10 @@ var userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    role: {
+        type: String,
+        default: "user",
+    },
 });
 
 // Define a pre-save middleware for the user schema
@@ -54,7 +58,7 @@ userSchema.pre("save", async function (next) {
     return await bcrypt.compare(enteredPassword, this.password);
   };
 
-  
+
 
 // Export the Mongoose model based on the defined schema, named 'User'
 module.exports = mongoose.model('User', userSchema);

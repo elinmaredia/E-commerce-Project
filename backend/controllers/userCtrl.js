@@ -1,6 +1,7 @@
 // Import the required modules for user authentication and security
 const User = require('../models/userModel.js');
 const asyncHandler = require('express-async-handler');
+const { generateToken } = require("../config/jwtToken");
 
 
 // Define an asynchronous function to manage user registration
@@ -32,7 +33,14 @@ const loginUserCtrl = asyncHandler(async (req, res) => {
     // Verify the user's credentials
     if (existingUser && (await existingUser.isPasswordMatched(password))) {
       
-      res.json(existingUser);
+        res.json({
+            _id: existingUser?._id,
+            firstname: existingUser?.firstname,
+            lastname: existingUser?.lastname,
+            email: existingUser?.email,
+            mobile: existingUser?.mobile,
+            token: generateToken(existingUser?._id),
+          });
 
     } else {
       // If the credentials are invalid, raise an error
@@ -40,8 +48,75 @@ const loginUserCtrl = asyncHandler(async (req, res) => {
     }
   });
   
+  // Retrieve all users with their wishlists
+const getAllUsers = asyncHandler(async (req, res) => {
+    try {
+      const allUsers = await User.find();
+      res.json(allUsers)
+      
+    } catch (error) {
+      throw new Error(error);
+    }
+  });
+  
+  // Retrieve a single user by ID
+  const getSingleUser = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const user = await User.findById(id);
+    res.json({
+        user,
+    })
+  
+    try {
+      const singleUser = await User.findById(id);
+      res.json({
+        user: singleUser,
+      });
+    } catch (error) {
+      throw new Error(error);
+    }
+  });
+  
+  // Delete a single user by ID
+  const deleteSingleUser = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+  
+    try {
+      const deletedUser = await User.findByIdAndDelete(id);
+      res.json({
+        deletedUser,
+      });
+    } catch (error) {
+      throw new Error(error);
+    }
+  });
+
+  //Update user's info
+  const updateUser = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+  
+    try {
+      const updatedUser = await User.findByIdAndUpdate(
+        id,
+        {
+          firstname: req?.body?.firstname,
+          lastname: req?.body?.lastname,
+          email: req?.body?.email,
+          mobile: req?.body?.mobile,
+        },
+        {
+          new: true,
+        }
+      );
+      res.json(updatedUser);
+    } catch (error) {
+      throw new Error(error);
+    }
+  });
+  
+  
 
 
 
 // Export the createUser function for use in other modules
-module.exports = { createUser, loginUserCtrl };
+module.exports = { createUser, loginUserCtrl, getAllUsers, getSingleUser, deleteSingleUser, updateUser };
