@@ -37,7 +37,21 @@ var userSchema = new mongoose.Schema({
         type: String,
         default: "user",
     },
-});
+    isBlocked: {
+        type: Boolean,
+        default: false,
+    },
+    cart: {
+        type: Array,
+        default: [],
+    },
+    address: [{type: mongoose.Schema.ObjectId, ref: "Address" }],
+    wishlist: [{type: mongoose.Schema.ObjectId, ref: "Product"}]
+},
+    {
+        timestamps: true
+    }
+);
 
 // Define a pre-save middleware for the user schema
 userSchema.pre("save", async function (next) {
