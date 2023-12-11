@@ -16,6 +16,9 @@ const PORT = process.env.PORT || 4000;
 // Import the authentication routes
 const authRouter = require('./routes/authRoutes.js');
 
+//Import cookie parser for refresh token
+const cookies = require('cookie-parser');
+
 // Import middleware for parsing request bodies
 const bodyParser = require('body-parser');
 
@@ -28,6 +31,8 @@ dbConnect();
 // Configure middleware to parse JSON and URL-encoded request bodies
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
+app.use(cookies());
 
 // Define a default route to handle incoming requests
 app.get('/', (req, res) => {
